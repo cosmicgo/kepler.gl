@@ -32,6 +32,7 @@ import {replaceMapControl} from './factories/map-control';
 import {replacePanelHeader} from './factories/panel-header';
 import {AUTH_TOKENS} from './constants/default-settings';
 import {messages} from './constants/localization';
+import 'semantic-ui-css/semantic.min.css';
 
 import {
   loadRemoteMap,
@@ -61,6 +62,7 @@ import sampleAnimateTrip from './data/sample-animate-trip-data';
 import sampleIconCsv, {config as savedMapConfig} from './data/sample-icon-csv';
 import {addDataToMap, addNotification} from 'kepler.gl/actions';
 import {processCsvData, processGeojson} from 'kepler.gl/processors';
+import ErrorBoundary from './error-boundary';
 /* eslint-enable no-unused-vars */
 
 const BannerHeight = 48;
@@ -386,24 +388,26 @@ class App extends Component {
               top: 0
             }}
           >
-            <AutoSizer>
-              {({height, width}) => (
-                <KeplerGl
-                  mapboxApiAccessToken={AUTH_TOKENS.MAPBOX_TOKEN}
-                  id="map"
-                  /*
-                   * Specify path to keplerGl state, because it is not mount at the root
-                   */
-                  getState={keplerGlGetState}
-                  width={width}
-                  height={height}
-                  cloudProviders={CLOUD_PROVIDERS}
-                  localeMessages={messages}
-                  onExportToCloudSuccess={onExportFileSuccess}
-                  onLoadCloudMapSuccess={onLoadCloudMapSuccess}
-                />
-              )}
-            </AutoSizer>
+            <ErrorBoundary>
+              <AutoSizer>
+                {({height, width}) => (
+                  <KeplerGl
+                    mapboxApiAccessToken={AUTH_TOKENS.MAPBOX_TOKEN}
+                    id="map"
+                    /*
+                     * Specify path to keplerGl state, because it is not mount at the root
+                     */
+                    getState={keplerGlGetState}
+                    width={width}
+                    height={height}
+                    cloudProviders={CLOUD_PROVIDERS}
+                    localeMessages={messages}
+                    onExportToCloudSuccess={onExportFileSuccess}
+                    onLoadCloudMapSuccess={onLoadCloudMapSuccess}
+                  />
+                )}
+              </AutoSizer>
+            </ErrorBoundary>
           </div>
         </GlobalStyle>
       </ThemeProvider>

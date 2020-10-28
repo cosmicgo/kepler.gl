@@ -48,6 +48,7 @@ export const QUERY_OPTIONS = keyMirror({
 });
 
 export const LOADING_METHODS = keyMirror({
+  database:null,
   remote: null,
   sample: null
 });
@@ -61,7 +62,7 @@ export const DEFAULT_FEATURE_FLAGS = {
 };
 
 export const AUTH_TOKENS = {
-  MAPBOX_TOKEN: process.env.MapboxAccessToken, // eslint-disable-line
+  MAPBOX_TOKEN:process.env.MapboxAccessToken, // eslint-disable-line
   DROPBOX_CLIENT_ID: process.env.DropboxClientId, // eslint-disable-line
   EXPORT_MAPBOX_TOKEN: process.env.MapboxExportToken, // eslint-disable-line
   CARTO_CLIENT_ID: process.env.CartoClientId // eslint-disable-line

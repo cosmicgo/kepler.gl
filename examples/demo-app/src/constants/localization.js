@@ -21,6 +21,7 @@
 // Add english messages here, other languages will use these
 // if translations not available for every message
 const en = {
+  'modal.loadData.database': 'Load From DB',
   'modal.loadData.remote': 'Load Map using URL',
   'sampleMapsTab.noData': 'No data ?',
   'sampleMapsTab.trySampleData': 'Try sample data',

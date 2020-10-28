@@ -23,8 +23,10 @@ import styled from 'styled-components';
 import window from 'global/window';
 import {connect} from 'react-redux';
 import KeplerGl from 'kepler.gl';
+require('dotenv').config()
 
-const MAPBOX_TOKEN = process.env.MapboxAccessToken; // eslint-disable-line
+
+const MAPBOX_TOKEN =process.env.MapboxAccessToken; //process.env.MapboxAccessToken; // eslint-disable-line
 
 const theme = {
   sidePanelBg: '#ffffff',
