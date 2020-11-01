@@ -1,8 +1,9 @@
-import React, {Component, useState} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {Formik, Form} from 'formik';
 import {Segment, Header, Label, Select, Button, FormField} from 'semantic-ui-react';
 //import {Button} from 'kepler.gl/components';
 import {FormattedMessage} from 'react-intl';
+import axios from 'axios';
 
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -17,7 +18,27 @@ import {useDispatch} from 'react-redux';
 // const propTypes = {
 //   onLoadRemoteMap: PropTypes.func.isRequired
 // };
+const consultarOperaciones = async() =>{
+  try {
+    const opSelect = await axios(
+      `https://iaajg116kd.execute-api.us-west-2.amazonaws.com/prod/operatio/getOperations`,
+      {
+        method: 'GET',
+        mode: 'no-cors',
+        crossdomain: true,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    //console.log(opSelect.data);
 
+    return opSelect.data
+  } catch (err) {
+    return []
+  }
+};
 //class LoadFromDb extends Component {
 export default function LoadFromDb() {
   const dispatch = useDispatch();
@@ -29,30 +50,65 @@ export default function LoadFromDb() {
     )
   );
   const [endtDate, setEndDate] = useState(new Date());
-  const [operation, setOperation] = useState("");
-  const [dataToLoad, setDataToLoad] = useState("");
+  const [operation, setOperation] = useState('');
+  const [operationList, setOperationList] = useState();
+  const [dataToLoad, setDataToLoad] = useState('');
 
-  const loadDataHandler = () => {
+  useEffect( () => {
+    consultarOperaciones().then(value => setOperationList(value) );
+        
+  }, []);
+
+  
+
+  const loadDataHandler = async () => {
     console.log('test');
-    console.log(startDate, endtDate, operation, dataToLoad);
+    console.log(
+      startDate.toISOString().split('T')[0],
+      endtDate.toISOString().split('T')[0],
+      operation,
+      dataToLoad
+    );
 
-    
+    try {
+      const dbData = await axios(
+        `https://iaajg116kd.execute-api.us-west-2.amazonaws.com/prod/rides/getRides?idOperation=${operation}&initDate=${
+          startDate.toISOString().split('T')[0]
+        }&endDate=${endtDate.toISOString().split('T')[0]}`,
+        {
+          method: 'GET',
+          mode: 'no-cors',
+          crossdomain: true,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': '*/*'
+          }
+        }
+      );
+      //console.log('data',dbData.data);
 
-    const data = Processors.processCsvData(testData);
-    // Create dataset structure
-    const dataset = {
-      data,
-      info: {
-        // `info` property are optional, adding an `id` associate with this dataset makes it easier
-        // to replace it later
-        id: 'my_data'
-      }
-    };
-    // addDataToMap action to inject dataset into kepler.gl instance
-    dispatch(addDataToMap({datasets: dataset}));
+      const data = Processors.processCsvData(dbData.data);
+      // Create dataset structure
+
+      const dataset = {
+        data,
+        info: {
+          // `info` property are optional, adding an `id` associate with this dataset makes it easier
+          // to replace it later
+          id: 'my_data'
+        }
+      };
+      // addDataToMap action to inject dataset into kepler.gl instance
+      dispatch(addDataToMap({datasets: dataset}));
+    } catch (err) {
+      console.log('error', err);
+    }
+
+    // const dbData = dbDataProm.body.text();
   };
-
+  
   return (
+    
     <Segment>
       <Formik
         initialValues={{
@@ -76,19 +132,17 @@ export default function LoadFromDb() {
           <Select
             placeholder="Operacion"
             name="operacion"
-            options={[{key: 'santiago', text: 'Santiago', value: 'santiago'}]}
-            onChange={(e, { value })=>setOperation(value)}
+            options={operationList}
+            onChange={(e, {value}) => setOperation(value)}
           />
           <Label>Seleccione tipo de Datos</Label>
           <Select
             placeholder="Datos"
             name="datos"
             options={[
-              {key: 'geocercas', text: 'Geocercas', value: 'geocercas'},
-              {key: 'rides', text: 'Rides', value: 'rides'},
-              {key: 'usuarios', text: 'Usuarios', value: 'usuarios'}
+              {key: 'santiago', text: 'Santiago', value: 'faa045d0-07c9-11ea-b69e-5ffcccd216e3'}
             ]}
-            onChange={(e, { value }) => setDataToLoad(value)}
+            onChange={(e, {value}) => setDataToLoad(value)}
           />
           <FormField>
             <label>Escoger rango de fechas</label>
@@ -127,5 +181,5 @@ export default function LoadFromDb() {
         </Form>
       </Formik>
     </Segment>
-);
+  );
 }
